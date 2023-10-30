@@ -24,7 +24,7 @@ public class GithubAuthController {
     private final Environment env;
 
     @GetMapping
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     public String authWithGithub(@RequestParam Optional<String> code) {
         final String clientId = env.getProperty("app.github.clientId", String.class);
         if (clientId == null) {
