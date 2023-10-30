@@ -63,6 +63,8 @@ jobs:
 
       - name: Tag
         run: |
+          git config --global user.email "xavier.bauquet@gmail.com"
+          git config --global user.name "Xavier Bauquet"
           git tag -a ${{ env.VERSION }} -m "${{ env.VERSION }}"
           git push origin --tags
 
@@ -80,3 +82,4 @@ jobs:
           IMAGE_ID=ghcr.io/$REPOSITORY_LOWERCASE
           docker tag image $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
+
