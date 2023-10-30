@@ -18,6 +18,8 @@ on:
 
 permissions:
   contents: write
+  packages: write
+
 env:
   JAVA_VERSION: 19
   JAVA_DISTRIBUTION: temurin
