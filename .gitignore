@@ -1,4 +1,5 @@
 src/main/resources/application-local.properties
+values-secrets.yaml
 
 .DS_Store
 HELP.md

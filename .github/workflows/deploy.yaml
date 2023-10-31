@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      appversion:
+        description: 'Version of java app'
+        required: true
+        default: 'latest'
+        type: string
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy
+        run: |
+          echo "$XBAUQUET_KUBECONFIG" > kubeconfig.yaml
+          echo "$DOCKER_SECRET" > values-secrets.yaml
+          
+          KUBECONFIG=./kubeconfig.yaml \
+          .github/tools/helmfile sync \
+          --set javaApp.image.tag=$APP_VERSION \
+          --set app.github.clientId=$GH_APP_CLIENT_ID \
+          --set app.github.clientSecret=$GH_APP_CLIENT_SECRET
+
+        env:
+          APP_VERSION: ${{ github.event.inputs.appversion }}
+          XBAUQUET_KUBECONFIG: ${{ secrets.XBAUQUET_KUBECONFIG }}
+          DOCKER_SECRET: ${{ secrets.DOCKER_SECRET }}
+          GH_APP_CLIENT_ID: ${{ secrets.GH_APP_CLIENT_ID }}
+          GH_APP_CLIENT_SECRET: ${{ secrets.GH_APP_CLIENT_SECRET }}

@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/xbauquet/ginny-api
+  pullPolicy: Always
+  tag: latest
+
+service:
+  type: ClusterIP
+  port: 8080
+
+imagePullSecrets:
+  name: github-packages-secret
+
+nameOverride: ""
+fullnameOverride: ""
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

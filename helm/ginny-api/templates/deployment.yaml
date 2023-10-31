@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ginny-api.fullname" . }}
+  labels:
+    {{- include "ginny-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ginny-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ginny-api.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: github-packages-secret
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: ginny-ci-env-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ginny-ci-env-config
+data:
+  app.github.clientId: {{ required "Value: app.github.clientId is required" .Values.app.github.clientId }}
+  app.github.clientSecret: {{ required "Value: app.github.clientSecret is required" .Values.app.github.clientSecret }}
