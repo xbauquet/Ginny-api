@@ -25,7 +25,9 @@ jobs:
           .github/tools/helmfile sync \
           --set javaApp.image.tag=$APP_VERSION \
           --set app.github.clientId=$GH_APP_CLIENT_ID \
-          --set app.github.clientSecret=$GH_APP_CLIENT_SECRET
+          --set app.github.clientSecret=$GH_APP_CLIENT_SECRET \
+          --set app.github.companion.clientId=$GH_COMPANION_CLIENT_ID \
+          --set app.github.companion.clientSecret=$GH_COMPANION_CLIENT_SECRET
 
         env:
           APP_VERSION: ${{ github.event.inputs.appversion }}
@@ -33,3 +35,5 @@ jobs:
           DOCKER_SECRET: ${{ secrets.DOCKER_SECRET }}
           GH_APP_CLIENT_ID: ${{ secrets.GH_APP_CLIENT_ID }}
           GH_APP_CLIENT_SECRET: ${{ secrets.GH_APP_CLIENT_SECRET }}
+          GH_COMPANION_CLIENT_ID: ${{ secrets.GH_COMPANION_CLIENT_ID }}
+          GH_COMPANION_CLIENT_SECRET: ${{ secrets.GH_COMPANION_CLIENT_SECRET }}

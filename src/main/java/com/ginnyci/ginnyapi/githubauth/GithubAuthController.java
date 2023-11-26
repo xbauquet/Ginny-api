@@ -1,41 +1,39 @@
 package com.ginnyci.ginnyapi.githubauth;
 
+import com.ginnyci.ginnyapi.EnvService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/ginny/auth")
+@CrossOrigin(origins = "*")
 public class GithubAuthController {
 
-    private final RestTemplateBuilder restTemplateBuilder;
-    private final Environment env;
+    private final RestTemplate restTemplate;
+    private final EnvService env;
 
-    @GetMapping
-    @CrossOrigin(origins = "*")
-    public String authWithGithub(@RequestParam Optional<String> code) {
-        final String clientId = env.getProperty("app.github.clientId", String.class);
-        if (clientId == null) {
-            throw new MissingEnvironmentException("app.github.clientId", String.class);
-        }
+    @GetMapping("/companion")
+    public String companionAuth(@RequestParam String code) {
+        return this.auth(code, env.COMPANION_CLIENT_ID, env.COMPANION_CLIENT_SECRET);
+    }
 
-        final String clientSecret = env.getProperty("app.github.clientSecret", String.class);
-        if (clientSecret == null) {
-            throw new MissingEnvironmentException("app.github.clientSecret", String.class);
-        }
+    @GetMapping("/app")
+    public String appAuth(@RequestParam String code) {
+        return this.auth(code, env.APP_CLIENT_ID, env.APP_CLIENT_SECRET);
+    }
 
+    private String auth(final String code, final String clientId, final String clientSecret) {
         final var headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         final var request = new HttpEntity<>(headers);
@@ -47,8 +45,7 @@ public class GithubAuthController {
                 .queryParam("client_secret", clientSecret)
                 .encode()
                 .toUriString();
-
-        final var response = this.restTemplateBuilder.build().exchange(url, HttpMethod.POST, request, GithubResponse.class);
+        final var response = this.restTemplate.exchange(url, HttpMethod.POST, request, GithubResponse.class);
         return response.getBody() != null ? response.getBody().getAccess_token() : null;
     }
 }
